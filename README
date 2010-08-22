@@ -12,11 +12,13 @@ port=80
 public abstract class MyConfig {
   public abstract String getHost();
   public abstract int getPort();
-  public URI getUrl() {
-    return URI.create("http://+getHost()+":"+getPort());
+  public URI getUri() {
+    return URI.create("http://"+getHost()+":"+getPort());
   }
 }
 
 Properties props = new Properties();
 props.load(myapp.properties);
 MyConfig config = JavaProperties.newInstance(props,MyConfig.class);
+
+config.getHost(); // www.google.com
