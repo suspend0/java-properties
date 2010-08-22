@@ -1,0 +1,22 @@
+
+Type-safe wrappers for java.util.Properties and java.util.ResourceBundle.
+
+//
+// Very early stages, this readme might not be up-to-date
+//
+
+== myapp.properties ==
+host=www.google.com
+port=80
+
+public abstract class MyConfig {
+  public abstract String getHost();
+  public abstract int getPort();
+  public URI getUrl() {
+    return URI.create("http://+getHost()+":"+getPort());
+  }
+}
+
+Properties props = new Properties();
+props.load(myapp.properties);
+MyConfig config = JavaProperties.newInstance(props,MyConfig.class);
