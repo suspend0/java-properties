@@ -10,20 +10,14 @@ public class JavaProperties {
         this.props = props;
     }
 
-    public static JavaProperties newInstance(Properties... properties) {
+    public static JavaProperties newBuilder(Properties... properties) {
         return new JavaProperties(Resolvers.viewOver(properties));
     }
 
     public <T> T create(Class<T> type) {
         if (type.isInterface()) {
-            return InterfaceProperties.create(props, type);
+            return JdkProxyPropertyImpl.create(props, type);
         }
-        if (Modifier.isAbstract(type.getModifiers())) {
-            throw new IllegalArgumentException();
-        }
-        if (Modifier.isFinal(type.getModifiers())) {
-            throw new IllegalArgumentException();
-        }
-        return ClassProperties.create(props,type);
+        return CglibPropertyImpl.create(props,type);
     }
 }

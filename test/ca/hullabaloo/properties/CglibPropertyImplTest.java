@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import java.util.Properties;
 
 @Test
-public class ClassPropertiesTest {
+public class CglibPropertyImplTest {
     public static class TestCl {
         public String getFoo() {
             return "13";
@@ -14,14 +14,14 @@ public class ClassPropertiesTest {
     }
 
     public void testDefault() {
-        TestCl instance = ClassProperties.create(Resolvers.viewOver(), TestCl.class);
+        TestCl instance = CglibPropertyImpl.create(Resolvers.viewOver(), TestCl.class);
         Assert.assertEquals(instance.getFoo(), "13");
     }
 
     public void testWithOverride() {
         Properties p = new Properties();
         p.setProperty("foo", "31");
-        TestCl instance = ClassProperties.create(Resolvers.viewOver(p), TestCl.class);
+        TestCl instance = CglibPropertyImpl.create(Resolvers.viewOver(p), TestCl.class);
         Assert.assertEquals(instance.getFoo(), "31");
     }
 
@@ -33,7 +33,7 @@ public class ClassPropertiesTest {
     }
 
     public void testNamespaceDefault() {
-        TestNsCl instance = ClassProperties.create(Resolvers.viewOver(), TestNsCl.class);
+        TestNsCl instance = CglibPropertyImpl.create(Resolvers.viewOver(), TestNsCl.class);
         Assert.assertEquals(instance.getFoo(), "13");
     }
 
@@ -41,7 +41,7 @@ public class ClassPropertiesTest {
         Properties p = new Properties();
         p.setProperty("foo", "21");
         p.setProperty("tw.bar.foo", "31");
-        TestNsCl instance = ClassProperties.create(Resolvers.viewOver(p), TestNsCl.class);
+        TestNsCl instance = CglibPropertyImpl.create(Resolvers.viewOver(p), TestNsCl.class);
         Assert.assertEquals(instance.getFoo(), "31");
     }
 
@@ -52,13 +52,13 @@ public class ClassPropertiesTest {
     public void testAbstractWithOverride() {
         Properties p = new Properties();
         p.setProperty("foo", "13");
-        TestAbstract instance = ClassProperties.create(Resolvers.viewOver(p),TestAbstract.class);
+        TestAbstract instance = CglibPropertyImpl.create(Resolvers.viewOver(p),TestAbstract.class);
         Assert.assertEquals(instance.getFoo(),"13");
     }
 
     @Test(expectedExceptions = JavaPropertyException.class)
     public void testAbstractWithoutOverride() {
-        ClassProperties.create(Resolvers.viewOver(), TestAbstract.class);
+        CglibPropertyImpl.create(Resolvers.viewOver(), TestAbstract.class);
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -68,6 +68,6 @@ public class ClassPropertiesTest {
 
     @Test(expectedExceptions = JavaPropertyException.class)
     public void testAbstractWithNonPublicMethod() {
-        ClassProperties.create(Resolvers.viewOver(), TestBadAbstract.class);
+        CglibPropertyImpl.create(Resolvers.viewOver(), TestBadAbstract.class);
     }
 }

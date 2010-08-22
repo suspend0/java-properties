@@ -11,10 +11,10 @@ import java.util.Map;
 
 import static ca.hullabaloo.properties.Utils.checkArgument;
 
-class ClassProperties<T> {
+class CglibPropertyImpl<T> {
     public static <T> T create(Resolver props, Class<T> type) {
         validateType(type);
-        return new ClassProperties<T>(props, type).createInstance();
+        return new CglibPropertyImpl<T>(props, type).createInstance();
     }
 
     private static <T> void validateType(Class<T> type) {
@@ -28,7 +28,7 @@ class ClassProperties<T> {
 
     private final Class<T> type;
 
-    private ClassProperties(Resolver props, Class<T> type) {
+    private CglibPropertyImpl(Resolver props, Class<T> type) {
         this.props = props;
         this.type = type;
     }

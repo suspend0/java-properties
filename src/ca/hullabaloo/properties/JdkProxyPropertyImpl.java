@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-class InterfaceProperties {
+class JdkProxyPropertyImpl {
     public static <T> T create(Resolver props, Class<T> type) {
         validate(props, type);
         return createProxy(type, new InterfaceMethodHandler(props));
