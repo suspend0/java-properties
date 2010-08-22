@@ -13,7 +13,7 @@ public abstract class MyConfig {
   public abstract String getHost();
   public abstract int getPort();
   public URI getUri() {
-    return URI.create("http://"+getHost()+":"+getPort());
+    return URI.create("http://" + getHost() + ":" + getPort());
   }
 }
 
