@@ -34,7 +34,6 @@ class CglibPropertyImpl<T> {
     }
 
     private T createInstance() {
-
         List<Callback> callbacks = new ArrayList<Callback>();
         callbacks.add(NoOp.INSTANCE);
         Map<Method, Integer> callbackIndex = new HashMap<Method, Integer>();
@@ -49,14 +48,17 @@ class CglibPropertyImpl<T> {
                 callbackIndex.put(m, 0);
             } else {
                 String prop = Utils.propertyName(m);
-                String value = this.props.resolve(prop);
+                Object value = this.props.resolve(prop);
                 if (value == null) {
                     if (Modifier.isAbstract(modifiers))
                         throw JavaPropertyException.missingProperty(prop, m);
                     callbackIndex.put(m, 0);
-                } else {
+                } else if (Constants.class.isAssignableFrom(this.type)) {
                     callbackIndex.put(m, callbacks.size());
                     callbacks.add(new FixedValueImpl(value));
+                } else {
+                    callbackIndex.put(m, callbacks.size());
+                    callbacks.add(new LiveValueImpl(prop, props));
                 }
             }
         }
@@ -75,9 +77,9 @@ class CglibPropertyImpl<T> {
     }
 
     private class FixedValueImpl implements FixedValue {
-        private final String value;
+        private final Object value;
 
-        public FixedValueImpl(String value) {
+        public FixedValueImpl(Object value) {
             this.value = value;
         }
 
@@ -96,6 +98,20 @@ class CglibPropertyImpl<T> {
         public int accept(Method method) {
             Integer i = this.callbackIndexes.get(method);
             return i == null ? 0 : i;
+        }
+    }
+
+    private class LiveValueImpl implements MethodInterceptor {
+        private final String name;
+        private final Resolver props;
+
+        public LiveValueImpl(String name, Resolver props) {
+            this.name = name;
+            this.props = props;
+        }
+
+        public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+            return props.resolve(name);
         }
     }
 }

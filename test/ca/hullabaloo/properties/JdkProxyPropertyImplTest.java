@@ -12,15 +12,38 @@ public class JdkProxyPropertyImplTest {
         String getFoo();
     }
 
-    public void testInterfaceProperties() {
-        TestIf instance = JdkProxyPropertyImpl.create(Resolvers.viewOver(), TestIf.class);
+    public void testProperties() {
+        TestIf instance = JdkProxyPropertyImpl.create(Resolvers.empty(), TestIf.class);
         Assert.assertEquals(instance.getFoo(), "13");
     }
 
-    public void testInterfacePropertiesWithOverride() {
+    public void testWithOverride() {
         Properties p = new Properties();
         p.setProperty("foo", "31");
-        TestIf instance = JdkProxyPropertyImpl.create(Resolvers.viewOver(p), TestIf.class);
+        TestIf instance = JdkProxyPropertyImpl.create(Resolvers.viewOf(p), TestIf.class);
         Assert.assertEquals(instance.getFoo(), "31");
     }
+
+    public void testChangingOverride() {
+        Properties p = new Properties();
+        p.setProperty("foo","31");
+        TestIf instance = JdkProxyPropertyImpl.create(Resolvers.viewOf(p), TestIf.class);
+        Assert.assertEquals(instance.getFoo(), "31");
+        p.setProperty("foo","41");
+        Assert.assertEquals(instance.getFoo(), "41");
+    }
+
+    public interface TestConstantIf extends Constants {
+        String foo();
+    }
+
+    public void testConstantsOverride() {
+        Properties p = new Properties();
+        p.setProperty("foo","31");
+        TestConstantIf instance = JdkProxyPropertyImpl.create(Resolvers.viewOf(p), TestConstantIf.class);
+        Assert.assertEquals(instance.foo(), "31");
+        p.setProperty("foo","41");
+        Assert.assertEquals(instance.foo(), "31");
+    }
+
 }

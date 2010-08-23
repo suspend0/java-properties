@@ -14,14 +14,38 @@ public class CglibPropertyImplTest {
     }
 
     public void testDefault() {
-        TestCl instance = CglibPropertyImpl.create(Resolvers.viewOver(), TestCl.class);
+        TestCl instance = CglibPropertyImpl.create(Resolvers.empty(), TestCl.class);
         Assert.assertEquals(instance.getFoo(), "13");
     }
 
     public void testWithOverride() {
         Properties p = new Properties();
         p.setProperty("foo", "31");
-        TestCl instance = CglibPropertyImpl.create(Resolvers.viewOver(p), TestCl.class);
+        TestCl instance = CglibPropertyImpl.create(Resolvers.viewOf(p), TestCl.class);
+        Assert.assertEquals(instance.getFoo(), "31");
+    }
+
+    public void testChangingOverride() {
+        Properties p = new Properties();
+        p.setProperty("foo", "31");
+        TestCl instance = CglibPropertyImpl.create(Resolvers.viewOf(p), TestCl.class);
+        Assert.assertEquals(instance.getFoo(), "31");
+        p.setProperty("foo", "41");
+        Assert.assertEquals(instance.getFoo(), "41");
+    }
+
+    public static class TestConstant implements Constants {
+        public String getFoo() {
+            return "13";
+        }
+    }
+
+    public void testConstantOverride() {
+        Properties p = new Properties();
+        p.setProperty("foo", "31");
+        TestConstant instance = CglibPropertyImpl.create(Resolvers.viewOf(p), TestConstant.class);
+        Assert.assertEquals(instance.getFoo(), "31");
+        p.setProperty("foo", "41");
         Assert.assertEquals(instance.getFoo(), "31");
     }
 
@@ -33,7 +57,7 @@ public class CglibPropertyImplTest {
     }
 
     public void testNamespaceDefault() {
-        TestNsCl instance = CglibPropertyImpl.create(Resolvers.viewOver(), TestNsCl.class);
+        TestNsCl instance = CglibPropertyImpl.create(Resolvers.empty(), TestNsCl.class);
         Assert.assertEquals(instance.getFoo(), "13");
     }
 
@@ -41,7 +65,7 @@ public class CglibPropertyImplTest {
         Properties p = new Properties();
         p.setProperty("foo", "21");
         p.setProperty("tw.bar.foo", "31");
-        TestNsCl instance = CglibPropertyImpl.create(Resolvers.viewOver(p), TestNsCl.class);
+        TestNsCl instance = CglibPropertyImpl.create(Resolvers.viewOf(p), TestNsCl.class);
         Assert.assertEquals(instance.getFoo(), "31");
     }
 
@@ -52,13 +76,13 @@ public class CglibPropertyImplTest {
     public void testAbstractWithOverride() {
         Properties p = new Properties();
         p.setProperty("foo", "13");
-        TestAbstract instance = CglibPropertyImpl.create(Resolvers.viewOver(p),TestAbstract.class);
-        Assert.assertEquals(instance.getFoo(),"13");
+        TestAbstract instance = CglibPropertyImpl.create(Resolvers.viewOf(p), TestAbstract.class);
+        Assert.assertEquals(instance.getFoo(), "13");
     }
 
     @Test(expectedExceptions = JavaPropertyException.class)
     public void testAbstractWithoutOverride() {
-        CglibPropertyImpl.create(Resolvers.viewOver(), TestAbstract.class);
+        CglibPropertyImpl.create(Resolvers.empty(), TestAbstract.class);
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -68,6 +92,6 @@ public class CglibPropertyImplTest {
 
     @Test(expectedExceptions = JavaPropertyException.class)
     public void testAbstractWithNonPublicMethod() {
-        CglibPropertyImpl.create(Resolvers.viewOver(), TestBadAbstract.class);
+        CglibPropertyImpl.create(Resolvers.empty(), TestBadAbstract.class);
     }
 }
