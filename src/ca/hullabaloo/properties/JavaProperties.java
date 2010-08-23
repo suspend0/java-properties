@@ -23,16 +23,19 @@ public class JavaProperties {
     public static class Builder {
         private List<Resolver> values = new ArrayList<Resolver>();
 
-        public void add(Properties props) {
+        public Builder add(Properties props) {
             values.add(Resolvers.viewOf(props));
+            return this;
         }
 
-        public void add(Map<String, ?> props) {
+        public Builder add(Map<String, ?> props) {
             values.add(Resolvers.viewOf(props));
+            return this;
         }
 
-        public void add(ResourceBundle props) {
+        public Builder add(ResourceBundle props) {
             values.add(Resolvers.viewOf(props));
+            return this;
         }
 
         JavaProperties build() {
