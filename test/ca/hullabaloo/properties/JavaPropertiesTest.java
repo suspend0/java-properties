@@ -16,14 +16,14 @@ public class JavaPropertiesTest {
     }
 
     @Test(dataProvider = TestTypes.ALL, dataProviderClass = TestTypes.class)
-    public void testWithOverride(Class<? extends Foo> type) {
-        Foo instance = bind(type, "foo", "31");
+    public void testWithOverride(Properties p, Class<? extends Foo> type) {
+        Foo instance = bind(type, p);
         Assert.assertEquals(instance.getFoo(), "31");
     }
 
     @Test(dataProvider = TestTypes.MUTABLE, dataProviderClass = TestTypes.class)
-    public void testChangingOverride(Class<? extends Foo> type) {
-        Properties p = TestSupport.props("foo", "31");
+    public void testChangingOverride(Properties p, Class<? extends Foo> type) {
+        p = (Properties) p.clone();
         Foo instance = TestSupport.bind(type, p);
         Assert.assertEquals(instance.getFoo(), "31");
         p.setProperty("foo", "41");
@@ -31,8 +31,8 @@ public class JavaPropertiesTest {
     }
 
     @Test(dataProvider = TestTypes.CONSTANT, dataProviderClass = TestTypes.class)
-    public void testConstantOverride(Class<? extends Foo> type) {
-        Properties p = TestSupport.props("foo", "31");
+    public void testConstantOverride(Properties p, Class<? extends Foo> type) {
+        p = (Properties) p.clone();
         Foo instance = TestSupport.bind(type, p);
         Assert.assertEquals(instance.getFoo(), "31");
         p.setProperty("foo", "41");

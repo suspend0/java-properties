@@ -4,14 +4,14 @@ import net.sf.cglib.proxy.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ca.hullabaloo.properties.Utils.checkArgument;
 
 class CglibPropertyImpl<T> {
+    private static final Set<Class<?>> SUPPORTED_RETURN_TYPES = new HashSet<Class<?>>(Arrays.<Class<?>>asList(
+            String.class));
+
     public static <T> T create(Resolver props, Class<T> type) {
         validateType(type);
         return new CglibPropertyImpl<T>(props, type).createInstance();
@@ -19,9 +19,9 @@ class CglibPropertyImpl<T> {
 
     private static <T> void validateType(Class<T> type) {
         if (!Modifier.isPublic(type.getModifiers()) || Modifier.isFinal(type.getModifiers()))
-            throw JavaPropertyException.nonPublicOrFinalClass(type);
+            throw JavaPropertiesException.nonPublicOrFinalClass(type);
         if (type.getEnclosingClass() != null && !Modifier.isStatic(type.getModifiers()))
-            throw JavaPropertyException.nonStaticInnerClass(type);
+            throw JavaPropertiesException.nonStaticInnerClass(type);
     }
 
     private final Resolver props;
@@ -34,46 +34,119 @@ class CglibPropertyImpl<T> {
     }
 
     private T createInstance() {
+        // see potentialMethods()
+        checkArgument(type.getSuperclass() == Object.class || type.isInterface());
+        boolean constants = Constants.class.isAssignableFrom(this.type);
+
         List<Callback> callbacks = new ArrayList<Callback>();
         callbacks.add(NoOp.INSTANCE);
         Map<Method, Integer> callbackIndex = new HashMap<Method, Integer>();
-        for (Method m : this.type.getDeclaredMethods()) {
-            checkArgument(m.getReturnType() == String.class);
+        for (Method m : potentialMethods()) {
+            boolean constantValue = false;
             checkArgument(m.getParameterTypes().length == 0);
-            int modifiers = m.getModifiers();
-            boolean shouldOverride = Modifier.isPublic(modifiers) && !Modifier.isFinal(modifiers);
-            if (!shouldOverride) {
-                if (Modifier.isAbstract(modifiers))
-                    throw JavaPropertyException.nonPublicAbstractMethod(m);
-                callbackIndex.put(m, 0);
+
+            String prop = Utils.propertyName(m);
+            Object value = this.props.resolve(prop);
+            if (value == null) {
+                value = fromDefaultAnnotation(m);
+                constantValue = true;
+            }
+            if (value == null) {
+                // nothing; we'll check if this is OK later
+            } else if (constants || constantValue) {
+                callbackIndex.put(m, callbacks.size());
+                callbacks.add(new FixedValueImpl(value));
             } else {
-                String prop = Utils.propertyName(m);
-                Object value = this.props.resolve(prop);
-                if (value == null) {
-                    if (Modifier.isAbstract(modifiers))
-                        throw JavaPropertyException.missingProperty(prop, m);
-                    callbackIndex.put(m, 0);
-                } else if (Constants.class.isAssignableFrom(this.type)) {
-                    callbackIndex.put(m, callbacks.size());
-                    callbacks.add(new FixedValueImpl(value));
-                } else {
-                    callbackIndex.put(m, callbacks.size());
-                    callbacks.add(new LiveValueImpl(prop, props));
-                }
+                callbackIndex.put(m, callbacks.size());
+                callbacks.add(new LiveValueImpl(prop, props));
             }
         }
+
         Enhancer e = new Enhancer();
-        e.setCallbacks(callbacks.toArray(new Callback[callbacks.size()]));
-        e.setCallbackFilter(new MapCallbackFilter(callbackIndex));
-        e.setSuperclass(this.type);
         e.setUseFactory(false);
         e.setUseCache(false);
-        return castToType(e.create());
+        e.setCallbacks(callbacks.toArray(new Callback[callbacks.size()]));
+        e.setCallbackFilter(new MapCallbackFilter(callbackIndex));
+
+        if (this.type.isInterface()) {
+            e.setInterfaces(new Class[]{this.type});
+        } else {
+            e.setSuperclass(this.type);
+        }
+
+        Object instance = e.create();
+        validateConstructedType(instance.getClass());
+        return castToType(instance);
+    }
+
+    private Object fromDefaultAnnotation(Method m) {
+        Default def = m.getAnnotation(Default.class);
+        return def == null ? null : def.value();
+    }
+
+    private Iterable<Method> potentialMethods() {
+        // since we don't support inheritance for our types, this can simply
+        // be current class + interface methods.   Note that if a class implements
+        // an interface method, IT is the declaring class, but if it does not
+        // (say, it's an abstract class) than the declaring class is still
+        // the interface
+        Set<Method> result = new LinkedHashSet<Method>();
+        for (Method m : this.type.getDeclaredMethods()) {
+            if (Modifier.isFinal(m.getModifiers()) || Modifier.isPrivate(m.getModifiers()))
+                continue;
+            if (isSupportedReturnType(m.getReturnType()))
+                result.add(m);
+        }
+        for (Method m : this.type.getMethods()) {
+            if (m.getDeclaringClass().isInterface())
+                if (isSupportedReturnType(m.getReturnType()))
+                    result.add(m);
+        }
+        return result;
+    }
+
+    private boolean isSupportedReturnType(Class<?> returnType) {
+        return SUPPORTED_RETURN_TYPES.contains(returnType);
     }
 
     @SuppressWarnings({"unchecked"})
     private T castToType(Object o) {
         return (T) o;
+    }
+
+    private void validateConstructedType(Class constructed) {
+        JavaPropertiesException e = null;
+        for (Method m : constructed.getMethods()) {
+            if (Modifier.isAbstract(m.getModifiers()))
+                e = addError(e, m);
+        }
+        for (Method m : constructed.getDeclaredMethods()) {
+            if (Modifier.isAbstract(m.getModifiers()))
+                e = addError(e, m);
+        }
+        if (e != null) {
+            throw e;
+        }
+    }
+
+    private JavaPropertiesException addError(JavaPropertiesException e, Method m) {
+        if (e == null) {
+            e = new JavaPropertiesException("Some methods could not be resolved on type %s", this.type);
+        }
+
+        boolean added = false;
+        if (!isSupportedReturnType(m.getReturnType())) {
+            e.unsupportedReturnType(m);
+            added = true;
+        }
+        if (this.props.resolve(Utils.propertyName(m)) == null) {
+            e.missingProperty(Utils.propertyName(m), m);
+            added = true;
+        }
+        if (!added) {
+            e.unknownError(m);
+        }
+        return e;
     }
 
     private class FixedValueImpl implements FixedValue {

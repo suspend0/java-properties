@@ -3,20 +3,21 @@ package ca.hullabaloo.properties;
 import java.util.*;
 
 public class JavaProperties {
-    private Resolver props;
-
-    private JavaProperties(Resolver props) {
-        this.props = props;
+    public static <T> T bind(Class<T> type, Properties p) {
+        return newBuilder().add(p).build().create(type);
     }
 
     public static Builder newBuilder() {
         return new Builder();
     }
 
+    private Resolver props;
+
+    private JavaProperties(Resolver props) {
+        this.props = props;
+    }
+
     public <T> T create(Class<T> type) {
-        if (type.isInterface()) {
-            return JdkProxyPropertyImpl.create(props, type);
-        }
         return CglibPropertyImpl.create(props, type);
     }
 

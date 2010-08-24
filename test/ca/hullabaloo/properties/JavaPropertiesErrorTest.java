@@ -2,25 +2,17 @@ package ca.hullabaloo.properties;
 
 import org.testng.annotations.Test;
 
+import java.util.Properties;
+
 @Test
 public class JavaPropertiesErrorTest {
-    @Test(expectedExceptions = JavaPropertyException.class)
+    @Test(expectedExceptions = JavaPropertiesException.class)
     public void testAbstractWithoutOverride() {
-        CglibPropertyImpl.create(Resolvers.empty(), TestTypes.TestAbstractMethod.class);
+        JavaProperties.bind(TestTypes.TestAbstractMethod.class, new Properties());
     }
 
-    @Test(expectedExceptions = JavaPropertyException.class)
+    @Test(expectedExceptions = JavaPropertiesException.class)
     public void testInterfaceWithoutDefault() {
-        CglibPropertyImpl.create(Resolvers.empty(), TestTypes.TestInterface.class);
-    }
-
-    @SuppressWarnings({"UnusedDeclaration"})
-    public static abstract class TestBadAbstract {
-        abstract String getFoo();
-    }
-
-    @Test(expectedExceptions = JavaPropertyException.class)
-    public void testAbstractWithNonPublicMethod() {
-        CglibPropertyImpl.create(Resolvers.empty(), TestBadAbstract.class);
+        JavaProperties.bind(TestTypes.TestInterface.class, new Properties());
     }
 }

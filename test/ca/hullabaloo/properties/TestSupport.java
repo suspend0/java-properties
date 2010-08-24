@@ -17,6 +17,6 @@ public class TestSupport {
     }
 
     public static <T> T bind(Class<T> type, Properties p) {
-        return JavaProperties.newBuilder().add(p).build().create(type);
+        return JavaProperties.bind(type,p);
     }
 }

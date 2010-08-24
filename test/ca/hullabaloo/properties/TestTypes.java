@@ -2,16 +2,26 @@ package ca.hullabaloo.properties;
 
 import org.testng.annotations.DataProvider;
 
+import java.util.Properties;
+
 public class TestTypes {
     public static class TestClass implements Foo {
         public String getFoo() {
             return "13";
+        }
+
+        public int getBar() {
+            return 13;
         }
     }
 
     public static class TestConstantClass implements Foo, Constants {
         public String getFoo() {
             return "13";
+        }
+
+        public int getBar() {
+            return 13;
         }
     }
 
@@ -26,6 +36,10 @@ public class TestTypes {
     public static abstract class TestAbstractClass implements Foo {
         public String getFoo() {
             return "13";
+        }
+
+        public int getBar() {
+            return 13;
         }
     }
 
@@ -42,7 +56,6 @@ public class TestTypes {
     public interface TestDefaultInterface extends Foo {
         @Default("13")
         public String getFoo();
-
     }
 
     public interface TestConstantInterface extends Foo, Constants {
@@ -51,6 +64,20 @@ public class TestTypes {
     }
 
     // =====TYPES above, PROVIDER below==================================================
+
+    private static Object[][] wrapWithProps(Class... types) {
+        Properties p = TestSupport.props(
+                "foo", "31",
+                "bar", "61"
+        );
+        Object[][] results = new Object[types.length][2];
+        for (int i = 0; i < types.length; i++) {
+            results[i][0] = p;
+            results[i][1] = types[i];
+        }
+        return results;
+    }
+
 
     private static Object[][] wrap(Class... types) {
         Object[][] results = new Object[types.length][1];
@@ -67,7 +94,7 @@ public class TestTypes {
 
     @DataProvider(name = ALL)
     public static Object[][] all() {
-        return wrap(
+        return wrapWithProps(
                 TestClass.class, TestAbstractClass.class, TestAbstractMethod.class,
                 TestDefaultInterface.class, TestInterface.class,
                 TestConstantClass.class, TestConstantAbstractClass.class,
@@ -81,14 +108,14 @@ public class TestTypes {
 
     @DataProvider(name = MUTABLE)
     public static Object[][] mutable() {
-        return wrap(
+        return wrapWithProps(
                 TestClass.class, TestAbstractClass.class, TestAbstractMethod.class,
                 TestDefaultInterface.class, TestInterface.class);
     }
 
     @DataProvider(name = CONSTANT)
     public static Object[][] constant() {
-        return wrap(
+        return wrapWithProps(
                 TestConstantClass.class, TestConstantAbstractClass.class,
                 TestConstantAbstractMethod.class, TestConstantInterface.class);
     }
