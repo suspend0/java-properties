@@ -56,6 +56,9 @@ public class TestTypes {
     public interface TestDefaultInterface extends Foo {
         @Default("13")
         public String getFoo();
+
+        @Default("13")
+        public int getBar();
     }
 
     public interface TestConstantInterface extends Foo, Constants {

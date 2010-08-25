@@ -15,4 +15,15 @@ public class JavaPropertiesErrorTest {
     public void testInterfaceWithoutDefault() {
         JavaProperties.bind(TestTypes.TestInterface.class, new Properties());
     }
+
+    @SuppressWarnings({"UnusedDeclaration"})
+    public interface BadTypeDefault {
+        @Default("bacon")
+        public int howMuchDoWeLoveIt();
+    }
+
+    @Test(expectedExceptions = JavaPropertiesException.class)
+    public void testCannotParseDefaults() {
+        JavaProperties.bind(BadTypeDefault.class, new Properties());
+    }
 }

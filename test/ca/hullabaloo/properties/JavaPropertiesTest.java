@@ -13,12 +13,14 @@ public class JavaPropertiesTest {
     public void testDefault(Class<? extends Foo> type) {
         Foo instance = bind(type);
         Assert.assertEquals(instance.getFoo(), "13");
+        Assert.assertEquals(instance.getBar(), 13);
     }
 
     @Test(dataProvider = TestTypes.ALL, dataProviderClass = TestTypes.class)
     public void testWithOverride(Properties p, Class<? extends Foo> type) {
         Foo instance = bind(type, p);
         Assert.assertEquals(instance.getFoo(), "31");
+        Assert.assertEquals(instance.getBar(), 61);
     }
 
     @Test(dataProvider = TestTypes.MUTABLE, dataProviderClass = TestTypes.class)
