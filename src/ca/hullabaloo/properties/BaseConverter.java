@@ -21,8 +21,9 @@ public abstract class BaseConverter<T> implements Converter {
     /**
      * X must be a subtype of T
      */
+    @SuppressWarnings({"unchecked"})
     public final <X> X convert(Object object, Class<X> targetType) {
-        return targetType.cast(convert(object));
+        return (X) convert(object);
     }
 
     protected abstract T convert(Object object);

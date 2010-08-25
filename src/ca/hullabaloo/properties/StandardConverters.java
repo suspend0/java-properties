@@ -118,7 +118,7 @@ class StandardConverters {
                 return CONVERTERS.containsKey(type);
             }
 
-            public Object convert(Object object, Class<?> targetType) {
+            public <T> T convert(Object object, Class<T> targetType) {
                 return CONVERTERS.get(targetType).convert(object, targetType);
             }
         };
