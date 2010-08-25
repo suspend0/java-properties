@@ -1,6 +1,5 @@
 package ca.hullabaloo.properties;
 
-import net.sf.cglib.core.Converter;
 import net.sf.cglib.proxy.*;
 
 import java.lang.reflect.Method;
@@ -10,44 +9,10 @@ import java.util.*;
 import static ca.hullabaloo.properties.Utils.checkArgument;
 
 class CglibPropertyImpl<T> {
-    private static final Map<Class<?>, Converter> CONVERTERS;
 
-    static {
-        Map<Class<?>, Converter> converters = new HashMap<Class<?>, Converter>(4);
-        converters.put(String.class, new Converter() {
-            public Object convert(Object value, Class target, Object context) {
-                return value == null ? null : value.toString();
-            }
-        });
-        converters.put(Integer.class, new Converter() {
-            public Object convert(Object value, Class target, Object context) {
-                if (value == null)
-                    return null;
-                if (value instanceof String)
-                    return Integer.parseInt((String) value);
-                if (value instanceof Number)
-                    return ((Number) value).intValue();
-                throw new ClassCastException("could not convert to Integer " + value.getClass());
-            }
-        });
-        converters.put(Integer.TYPE, new Converter() {
-            public Object convert(Object value, Class target, Object context) {
-                if (value == null)
-                    throw new NullPointerException();
-                if (value instanceof String)
-                    return Integer.parseInt((String) value);
-                if (value instanceof Number)
-                    return ((Number) value).intValue();
-                throw new ClassCastException("could not convert to Integer " + value.getClass());
-            }
-        });
-
-        CONVERTERS = converters;
-    }
-
-    public static <T> T create(Resolver props, Class<T> type) {
+    public static <T> T create(Class<T> type, Resolver props, Converter converter) {
         validateType(type);
-        return new CglibPropertyImpl<T>(props, type).createInstance();
+        return new CglibPropertyImpl<T>(type, props, converter).createInstance();
     }
 
     private static <T> void validateType(Class<T> type) {
@@ -57,13 +22,16 @@ class CglibPropertyImpl<T> {
             throw JavaPropertiesException.nonStaticInnerClass(type);
     }
 
-    private final Resolver props;
-
     private final Class<T> type;
 
-    private CglibPropertyImpl(Resolver props, Class<T> type) {
+    private final Resolver props;
+
+    private final Converter converter;
+
+    private CglibPropertyImpl(Class<T> type, Resolver props, Converter converter) {
         this.props = props;
         this.type = type;
+        this.converter = converter;
     }
 
     private T createInstance() {
@@ -80,10 +48,7 @@ class CglibPropertyImpl<T> {
             boolean constantValue = false;
             checkArgument(m.getParameterTypes().length == 0);
 
-            // potentialMethods() filters out things we don't have converters for,
-            // so 'converter' will never be null
-            Class valueType = m.getReturnType();
-            Converter converter = CONVERTERS.get(valueType);
+            Class<?> valueType = m.getReturnType();
 
             String prop = Utils.propertyName(m);
             Object value = this.props.resolve(prop);
@@ -93,7 +58,7 @@ class CglibPropertyImpl<T> {
             }
             if (value != null) {
                 try {
-                    value = converter.convert(value, valueType, null);
+                    value = converter.convert(value, valueType);
                 } catch (RuntimeException e) {
                     //noinspection ThrowableResultOfMethodCallIgnored
                     errors.conversionError(m, value, e);
@@ -156,7 +121,7 @@ class CglibPropertyImpl<T> {
     }
 
     private boolean isSupportedReturnType(Class<?> returnType) {
-        return CONVERTERS.keySet().contains(returnType);
+        return converter.supportsType(returnType);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -221,7 +186,7 @@ class CglibPropertyImpl<T> {
         private final String name;
         private final Resolver props;
 
-        public LiveValueImpl(Class valueType, Converter converter, String name, Resolver props) {
+        public LiveValueImpl(Class<?> valueType, Converter converter, String name, Resolver props) {
             this.valueType = valueType;
             this.converter = converter;
             this.name = name;
@@ -230,7 +195,7 @@ class CglibPropertyImpl<T> {
 
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) {
             Object value = props.resolve(name);
-            return converter.convert(value, valueType, null);
+            return converter.convert(value, valueType);
         }
     }
 }

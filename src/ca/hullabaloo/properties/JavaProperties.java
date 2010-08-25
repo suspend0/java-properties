@@ -18,7 +18,7 @@ public class JavaProperties {
     }
 
     public <T> T create(Class<T> type) {
-        return CglibPropertyImpl.create(props, type);
+        return CglibPropertyImpl.create(type, props, StandardConverters.all() );
     }
 
     public static class Builder {

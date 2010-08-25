@@ -5,23 +5,72 @@ import org.testng.annotations.DataProvider;
 import java.util.Properties;
 
 public class TestTypes {
+    //
+    static final String FOO_VAL = "13";
+    static final String FOO_S = "13";
+    static final String FOO_O = "31";
+
+    //
+    static final int BAR_VAL = 133;
+    static final String BAR_S = "133";
+    static final int BAR_O = 313;
+
+    //
+    static final double BAZ_VAL = 1.33d;
+    static final String BAZ_S = "1.33";
+    static final double BAZ_O = 3.13d;
+
+    //
+    static final long LOU_VAL = 1333L;
+    static final String LOU_S = "1333";
+    static final long LOU_O = 3133L;
+
+    //
+    static final float ALICE_VAL = 13.33f;
+    static final String ALICE_S = "13.33";
+    static final float ALICE_O = 31.33f;
+
     public static class TestClass implements Foo {
         public String getFoo() {
-            return "13";
+            return FOO_VAL;
         }
 
         public int getBar() {
-            return 13;
+            return BAR_VAL;
+        }
+
+        public double getBazBaz() {
+            return BAZ_VAL;
+        }
+
+        public long getLou() {
+            return LOU_VAL;
+        }
+
+        public float alice() {
+            return ALICE_VAL;
         }
     }
 
     public static class TestConstantClass implements Foo, Constants {
         public String getFoo() {
-            return "13";
+            return FOO_VAL;
         }
 
         public int getBar() {
-            return 13;
+            return BAR_VAL;
+        }
+
+        public double getBazBaz() {
+            return BAZ_VAL;
+        }
+
+        public long getLou() {
+            return LOU_VAL;
+        }
+
+        public float alice() {
+            return ALICE_VAL;
         }
     }
 
@@ -31,22 +80,39 @@ public class TestTypes {
 
     public static abstract class TestConstantAbstractMethod implements Foo, Constants {
         public abstract String getFoo();
+
+        public abstract int getBar();
+
+        public abstract double getBazBaz();
+
+        public abstract long getLou();
+
+        public abstract float alice();
     }
 
     public static abstract class TestAbstractClass implements Foo {
         public String getFoo() {
-            return "13";
+            return FOO_VAL;
         }
 
         public int getBar() {
-            return 13;
+            return BAR_VAL;
+        }
+
+        public double getBazBaz() {
+            return BAZ_VAL;
+        }
+
+        public long getLou() {
+            return LOU_VAL;
+        }
+
+        public float alice() {
+            return ALICE_VAL;
         }
     }
 
     public static abstract class TestConstantAbstractClass implements Foo, Constants {
-        public String getFoo() {
-            return "13";
-        }
     }
 
     public interface TestInterface extends Foo {
@@ -54,15 +120,24 @@ public class TestTypes {
     }
 
     public interface TestDefaultInterface extends Foo {
-        @Default("13")
+        @Default(FOO_S)
         public String getFoo();
 
-        @Default("13")
+        @Default(BAR_S)
         public int getBar();
+
+        @Default(BAZ_S)
+        public double getBazBaz();
+
+        @Default(LOU_S)
+        public long getLou();
+
+        @Default(ALICE_S)
+        public float alice();
     }
 
     public interface TestConstantInterface extends Foo, Constants {
-        @Default("13")
+        @Default(FOO_VAL)
         public String getFoo();
     }
 
@@ -70,8 +145,11 @@ public class TestTypes {
 
     private static Object[][] wrapWithProps(Class... types) {
         Properties p = TestSupport.props(
-                "foo", "31",
-                "bar", "61"
+                "foo", String.valueOf(FOO_O),
+                "bar", String.valueOf(BAR_O),
+                "baz.baz", String.valueOf(BAZ_O),
+                "lou", String.valueOf(LOU_O),
+                "alice", String.valueOf(ALICE_O)
         );
         Object[][] results = new Object[types.length][2];
         for (int i = 0; i < types.length; i++) {
