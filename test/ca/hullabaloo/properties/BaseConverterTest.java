@@ -3,16 +3,26 @@ package ca.hullabaloo.properties;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class BaseConverterTest {
-    private BaseConverter<String> instance = new BaseConverter<String>() {
-        @Override
-        protected String convert(Object object) {
-            return null;
-        }
-    };
+class BaseConverterTest {
+    @Test
+    public void supportsStringType() throws Exception {
+        BaseConverter<String> instance = new BaseConverter<String>() {
+            @Override
+            protected String convert(Object object) {
+                return null;
+            }
+        };
+        Assert.assertTrue(instance.supportsType(String.class));
+    }
 
     @Test
-    public void testSupportsType() throws Exception {
-        Assert.assertTrue(instance.supportsType(String.class));
+    public void supportsStringArrayType() throws Exception {
+        BaseConverter<String[]> instance = new BaseConverter<String[]>() {
+            @Override
+            protected String[] convert(Object object) {
+                return null;
+            }
+        };
+        Assert.assertTrue(instance.supportsType(String[].class));
     }
 }

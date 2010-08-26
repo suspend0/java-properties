@@ -18,7 +18,10 @@ public class JavaProperties {
     }
 
     public <T> T create(Class<T> type) {
-        return CglibPropertyImpl.create(type, props, StandardConverters.all() );
+        Converter standard = StandardConverters.all();
+        Converter standardArrays = ArrayConverter.create(standard);
+        Converter converter = Converters.combine(standard,standardArrays);
+        return CglibPropertyImpl.create(type, props, converter);
     }
 
     public static class Builder {

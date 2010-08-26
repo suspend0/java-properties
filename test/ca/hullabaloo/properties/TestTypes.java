@@ -2,6 +2,7 @@ package ca.hullabaloo.properties;
 
 import org.testng.annotations.DataProvider;
 
+import java.util.Arrays;
 import java.util.Properties;
 
 public class TestTypes {
@@ -21,16 +22,15 @@ public class TestTypes {
     static final double BAZ_O = 3.13d;
 
     //
-    static final long LOU_VAL = 1333L;
-    static final String LOU_S = "1333";
     static final long LOU_O = 3133L;
-
-    //
-    static final float ALICE_VAL = 13.33f;
-    static final String ALICE_S = "13.33";
     static final float ALICE_O = 31.33f;
+    public static final String[] AUNTS_O = {"b","c"};
+    public static final int[] UNCLES_O = {87};
+    public static final double[] RAH_RAH_RAH_O = {83.33d};
+    public static final long[] GO_O = {33223L};
+    public static final float[] THERE_O = {18.3f};
 
-    public static class TestClass implements Foo {
+    public static class TestClass implements Bar {
         public String getFoo() {
             return FOO_VAL;
         }
@@ -44,11 +44,31 @@ public class TestTypes {
         }
 
         public long getLou() {
-            return LOU_VAL;
+            return 0;
         }
 
         public float alice() {
-            return ALICE_VAL;
+            return 0f;
+        }
+
+        public String[] aunts() {
+            return null;
+        }
+
+        public int[] getUncles() {
+            return null;
+        }
+
+        public double[] isRahRahRah() {
+            return null;
+        }
+
+        public long[] go() {
+            return null;
+        }
+
+        public float[] there() {
+            return null;
         }
     }
 
@@ -64,14 +84,6 @@ public class TestTypes {
         public double getBazBaz() {
             return BAZ_VAL;
         }
-
-        public long getLou() {
-            return LOU_VAL;
-        }
-
-        public float alice() {
-            return ALICE_VAL;
-        }
     }
 
     public static abstract class TestAbstractMethod implements Foo {
@@ -84,10 +96,6 @@ public class TestTypes {
         public abstract int getBar();
 
         public abstract double getBazBaz();
-
-        public abstract long getLou();
-
-        public abstract float alice();
     }
 
     public static abstract class TestAbstractClass implements Foo {
@@ -102,21 +110,12 @@ public class TestTypes {
         public double getBazBaz() {
             return BAZ_VAL;
         }
-
-        public long getLou() {
-            return LOU_VAL;
-        }
-
-        public float alice() {
-            return ALICE_VAL;
-        }
     }
 
     public static abstract class TestConstantAbstractClass implements Foo, Constants {
     }
 
-    public interface TestInterface extends Foo {
-        public String getFoo();
+    public interface TestInterface extends Bar {
     }
 
     public interface TestDefaultInterface extends Foo {
@@ -128,12 +127,6 @@ public class TestTypes {
 
         @Default(BAZ_S)
         public double getBazBaz();
-
-        @Default(LOU_S)
-        public long getLou();
-
-        @Default(ALICE_S)
-        public float alice();
     }
 
     public interface TestConstantInterface extends Foo, Constants {
@@ -149,7 +142,12 @@ public class TestTypes {
                 "bar", String.valueOf(BAR_O),
                 "baz.baz", String.valueOf(BAZ_O),
                 "lou", String.valueOf(LOU_O),
-                "alice", String.valueOf(ALICE_O)
+                "alice", String.valueOf(ALICE_O),
+                "aunts", Arrays.toString(AUNTS_O),
+                "uncles", Arrays.toString(UNCLES_O),
+                "rah.rah.rah", Arrays.toString(RAH_RAH_RAH_O),
+                "go", Arrays.toString(GO_O),
+                "there", Arrays.toString(THERE_O)
         );
         Object[][] results = new Object[types.length][2];
         for (int i = 0; i < types.length; i++) {
@@ -168,12 +166,18 @@ public class TestTypes {
     }
 
     public static final String
-            ALL = "all",
+            ALL_BAR = "all-bar",
+            ALL_FOO = "all-foo",
             HAS_DEFAULT = "HAS_DEFAULT",
             MUTABLE = "MUTABLE",
             CONSTANT = "CONSTANT";
 
-    @DataProvider(name = ALL)
+    @DataProvider(name = ALL_BAR)
+    public static Object[][] allBar() {
+        return wrapWithProps(TestClass.class,TestInterface.class);
+    }
+
+    @DataProvider(name = ALL_FOO)
     public static Object[][] all() {
         return wrapWithProps(
                 TestClass.class, TestAbstractClass.class, TestAbstractMethod.class,
