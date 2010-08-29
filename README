@@ -1,24 +1,25 @@
 
-Type-safe wrappers for java.util.Properties and java.util.ResourceBundle.
+== == == == == == == == == == == == == == == == == == == == == == 
+== Type-safe wrappers for java.util.Properties and java.util.ResourceBundle.
+== == == == == == == == == == == == == == == == == == == == == == 
 
-//
-// Very early stages, this readme might not be up-to-date
-//
+If you have a properties file like 
 
-== myapp.properties ==
-host=www.google.com
-port=80
+  host=www.google.com
+  port=80
 
-public abstract class MyConfig {
-  public abstract String getHost();
-  public abstract int getPort();
-  public URI getUri() {
-    return URI.create("http://" + getHost() + ":" + getPort());
+and an interface
+
+  public interface MyConfig {
+    public String getHost();
+    public int getPort();
   }
-}
 
-Properties props = new Properties();
-props.load(myapp.properties);
-MyConfig config = JavaProperties.newInstance(props,MyConfig.class);
+Then you can "bind" the two together.  JavaProperties will do the 
+magic so MyConfig.getPort() returns 80;
 
-config.getHost(); // www.google.com
+  MyConfig config = JavaProperties.bind(MyConfig.class, props);
+  config.getPort(); // return 80
+
+Supported return types are all the basic number types and their
+wrappers, all enums and arrays of same, plus String.
