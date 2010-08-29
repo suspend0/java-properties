@@ -20,7 +20,9 @@ public class JavaProperties {
     public <T> T create(Class<T> type) {
         Converter standard = StandardConverters.all();
         Converter standardArrays = ArrayConverter.create(standard);
-        Converter converter = Converters.combine(standard,standardArrays);
+        Converter enums = EnumConverter.instance();
+        Converter enumArrays = ArrayConverter.create(enums);
+        Converter converter = Converters.combine(standard,standardArrays, enums, enumArrays);
         return CglibPropertyImpl.create(type, props, converter);
     }
 

@@ -39,6 +39,8 @@ public class JavaPropertiesTest {
         Assert.assertTrue(Arrays.equals(instance.isRahRahRah(), TestTypes.RAH_RAH_RAH_O));
         Assert.assertTrue(Arrays.equals(instance.go(), TestTypes.GO_O));
         Assert.assertTrue(Arrays.equals(instance.there(), TestTypes.THERE_O));
+        Assert.assertEquals(instance.wahooie(), TestTypes.WAHOOIE_O);
+        Assert.assertTrue(Arrays.equals(instance.wahooies(),TestTypes.WAHOOIES_O));
     }
 
     @Test(dataProvider = TestTypes.MUTABLE, dataProviderClass = TestTypes.class)

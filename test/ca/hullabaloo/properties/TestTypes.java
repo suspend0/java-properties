@@ -29,6 +29,8 @@ public class TestTypes {
     public static final double[] RAH_RAH_RAH_O = {83.33d};
     public static final long[] GO_O = {33223L};
     public static final float[] THERE_O = {18.3f};
+    public static final Baz WAHOOIE_O = Baz.BEE;
+    public static final Baz[] WAHOOIES_O = {Baz.EH,Baz.BEE};
 
     public static class TestClass implements Bar {
         public String getFoo() {
@@ -68,6 +70,14 @@ public class TestTypes {
         }
 
         public float[] there() {
+            return null;
+        }
+
+        public Baz wahooie() {
+            return null;
+        }
+
+        public Baz[] wahooies() {
             return null;
         }
     }
@@ -147,7 +157,9 @@ public class TestTypes {
                 "uncles", Arrays.toString(UNCLES_O),
                 "rah.rah.rah", Arrays.toString(RAH_RAH_RAH_O),
                 "go", Arrays.toString(GO_O),
-                "there", Arrays.toString(THERE_O)
+                "there", Arrays.toString(THERE_O),
+                "wahooie", String.valueOf(WAHOOIE_O),
+                "wahooies", Arrays.toString(WAHOOIES_O)
         );
         Object[][] results = new Object[types.length][2];
         for (int i = 0; i < types.length; i++) {

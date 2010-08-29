@@ -8,4 +8,6 @@ public interface Bar extends Foo {
     double[] isRahRahRah();
     long[] go();
     float[] there();
+    Baz wahooie();
+    Baz[] wahooies();
 }
