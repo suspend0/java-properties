@@ -6,23 +6,23 @@ import org.testng.annotations.Test;
 class BaseConverterTest {
     @Test
     public void supportsStringType() throws Exception {
-        BaseConverter<String> instance = new BaseConverter<String>() {
+        BaseConverter<String> instance = new BaseConverter<String>(String.class) {
             @Override
             protected String convert(Object object) {
                 return null;
             }
         };
-        Assert.assertTrue(instance.supportsType(String.class));
+        Assert.assertTrue(instance.supportsTarget(String.class));
     }
 
     @Test
     public void supportsStringArrayType() throws Exception {
-        BaseConverter<String[]> instance = new BaseConverter<String[]>() {
+        BaseConverter<String[]> instance = new BaseConverter<String[]>(String[].class) {
             @Override
             protected String[] convert(Object object) {
                 return null;
             }
         };
-        Assert.assertTrue(instance.supportsType(String[].class));
+        Assert.assertTrue(instance.supportsTarget(String[].class));
     }
 }

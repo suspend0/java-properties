@@ -7,7 +7,7 @@ public class ConvertersTest {
     @Test
     public void testCombine() throws Exception {
         Converter a = new Converter() {
-            public boolean supportsType(Class<?> type) {
+            public boolean supportsTarget(Class<?> type) {
                 return type == String.class;
             }
 
@@ -16,7 +16,7 @@ public class ConvertersTest {
             }
         };
         Converter b = new Converter() {
-            public boolean supportsType(Class<?> type) {
+            public boolean supportsTarget(Class<?> type) {
                 return type == Integer.class;
             }
 
@@ -26,9 +26,9 @@ public class ConvertersTest {
         };
 
         Converter instance = Converters.combine(a, b);
-        Assert.assertTrue(instance.supportsType(String.class));
-        Assert.assertTrue(instance.supportsType(Integer.class));
-        Assert.assertFalse(instance.supportsType(Float.class));
+        Assert.assertTrue(instance.supportsTarget(String.class));
+        Assert.assertTrue(instance.supportsTarget(Integer.class));
+        Assert.assertFalse(instance.supportsTarget(Float.class));
         Assert.assertEquals(instance.convert(new Object(), String.class), "x");
         Assert.assertEquals(instance.convert(new Object(), Integer.class), Integer.valueOf(1));
     }

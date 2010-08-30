@@ -4,8 +4,14 @@ import java.lang.reflect.Array;
 
 import static ca.hullabaloo.properties.Utils.checkArgument;
 
+/**
+ * Wraps a regular {@Converter} to parse arrays of same from strings formatted the way
+ * {@link java.util.Arrays#toString} writes them: [a,b]
+ *
+ * @see #wrap(Converter)
+ */
 class ArrayConverter implements Converter {
-    public static ArrayConverter create(Converter componentConverter) {
+    public static ArrayConverter wrap(Converter componentConverter) {
         return new ArrayConverter(componentConverter);
     }
 
@@ -15,12 +21,12 @@ class ArrayConverter implements Converter {
         this.componentConverter = componentConverter;
     }
 
-    public boolean supportsType(Class<?> type) {
-        return type.isArray() && componentConverter.supportsType(type.getComponentType());
+    public boolean supportsTarget(Class<?> type) {
+        return type.isArray() && componentConverter.supportsTarget(type.getComponentType());
     }
 
     public <T> T convert(Object object, Class<T> arrayType) {
-        checkArgument(supportsType(arrayType));
+        checkArgument(supportsTarget(arrayType));
         if (arrayType.isInstance(object))
             return arrayType.cast(object);
         if (object instanceof String)

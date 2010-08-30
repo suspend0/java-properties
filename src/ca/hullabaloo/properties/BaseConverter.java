@@ -1,20 +1,19 @@
 package ca.hullabaloo.properties;
 
-import java.lang.reflect.ParameterizedType;
+import static ca.hullabaloo.properties.Utils.checkArgument;
 
-/* Base class for simple type converstion */
-
-public abstract class BaseConverter<T> implements Converter {
+/**
+ * Base class for simple type conversion.  It compensates for the somewhat strange
+ * generic signature of Converter.
+ */
+abstract class BaseConverter<T> implements Converter {
     private final Class<T> targetType;
 
-    @SuppressWarnings({"unchecked"})
-    public BaseConverter() {
-        ParameterizedType parameterizedType =
-                (ParameterizedType) getClass().getGenericSuperclass();
-        targetType = (Class<T>) parameterizedType.getActualTypeArguments()[0];
+    protected BaseConverter(Class<T> targetType) {
+        this.targetType = targetType;
     }
 
-    public final boolean supportsType(Class<?> type) {
+    public final boolean supportsTarget(Class<?> type) {
         return type == targetType;
     }
 
@@ -23,6 +22,8 @@ public abstract class BaseConverter<T> implements Converter {
      */
     @SuppressWarnings({"unchecked"})
     public final <X> X convert(Object object, Class<X> targetType) {
+        // 'int' converters get passed targetType is Integer.
+        // checkArgument(supportsTarget(targetType));
         return (X) convert(object);
     }
 

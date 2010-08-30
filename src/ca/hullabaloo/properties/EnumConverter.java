@@ -2,14 +2,19 @@ package ca.hullabaloo.properties;
 
 import static ca.hullabaloo.properties.Utils.checkArgument;
 
-public class EnumConverter implements Converter {
-    public boolean supportsType(Class<?> type) {
+/**
+ * Converts an enum type from its string name to the enum value
+ */
+enum EnumConverter implements Converter {
+    INSTANCE;
+
+    public boolean supportsTarget(Class<?> type) {
         return type.isEnum();
     }
 
     @SuppressWarnings({"unchecked"})
     public <T> T convert(Object object, Class<T> targetType) {
-        checkArgument(supportsType(targetType));
+        checkArgument(supportsTarget(targetType));
         Exception cause = null;
         try {
             Class<? extends Enum> enumType = targetType.asSubclass(Enum.class);
@@ -27,9 +32,5 @@ public class EnumConverter implements Converter {
         ClassCastException e = new ClassCastException("Cannot translate '" + object + "' into " + targetType);
         if (cause != null) e.initCause(cause);
         throw e;
-    }
-
-    public static Converter instance() {
-        return new EnumConverter();
     }
 }

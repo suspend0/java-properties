@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Converters are used to tranlate property data (usually a String) into the declared
+ * Converters are used to translate property data (usually a String) into the declared
  * return type of the method that's bound to that property value.
  * <p/>
  * This set of converters is for the basic types String,Integer,Long,Float,Double
@@ -15,12 +15,12 @@ class StandardConverters {
 
     static {
         Map<Class<?>, Converter> converters = new HashMap<Class<?>, Converter>(4);
-        converters.put(String.class, new BaseConverter<String>() {
+        converters.put(String.class, new BaseConverter<String>(String.class) {
             public String convert(Object value) {
                 return value == null ? null : value.toString();
             }
         });
-        converters.put(Integer.class, new BaseConverter<Integer>() {
+        converters.put(Integer.class, new BaseConverter<Integer>(Integer.class) {
             public Integer convert(Object value) {
                 if (value == null)
                     return null;
@@ -31,7 +31,7 @@ class StandardConverters {
                 throw new ClassCastException("could not convert to Integer " + value.getClass());
             }
         });
-        converters.put(Integer.TYPE, new BaseConverter<Integer>() {
+        converters.put(Integer.TYPE, new BaseConverter<Integer>(Integer.class) {
             public Integer convert(Object value) {
                 if (value == null)
                     throw new NullPointerException();
@@ -42,7 +42,7 @@ class StandardConverters {
                 throw new ClassCastException("could not convert to Integer " + value.getClass());
             }
         });
-        converters.put(Double.class, new BaseConverter<Double>() {
+        converters.put(Double.class, new BaseConverter<Double>(Double.class) {
             public Double convert(Object value) {
                 if (value == null)
                     return null;
@@ -53,7 +53,7 @@ class StandardConverters {
                 throw new ClassCastException("could not convert to Double " + value.getClass());
             }
         });
-        converters.put(Double.TYPE, new BaseConverter<Double>() {
+        converters.put(Double.TYPE, new BaseConverter<Double>(Double.class) {
             public Double convert(Object value) {
                 if (value == null)
                     throw new NullPointerException();
@@ -64,7 +64,7 @@ class StandardConverters {
                 throw new ClassCastException("could not convert to Double " + value.getClass());
             }
         });
-        converters.put(Long.class, new BaseConverter<Long>() {
+        converters.put(Long.class, new BaseConverter<Long>(Long.class) {
             public Long convert(Object value) {
                 if (value == null)
                     return null;
@@ -75,7 +75,7 @@ class StandardConverters {
                 throw new ClassCastException("could not convert to Long " + value.getClass());
             }
         });
-        converters.put(Long.TYPE, new BaseConverter<Long>() {
+        converters.put(Long.TYPE, new BaseConverter<Long>(Long.class) {
             public Long convert(Object value) {
                 if (value == null)
                     throw new NullPointerException();
@@ -86,7 +86,7 @@ class StandardConverters {
                 throw new ClassCastException("could not convert to Long " + value.getClass());
             }
         });
-        converters.put(Float.class, new BaseConverter<Float>() {
+        converters.put(Float.class, new BaseConverter<Float>(Float.class) {
             public Float convert(Object value) {
                 if (value == null)
                     return null;
@@ -97,7 +97,7 @@ class StandardConverters {
                 throw new ClassCastException("could not convert to Float " + value.getClass());
             }
         });
-        converters.put(Float.TYPE, new BaseConverter<Float>() {
+        converters.put(Float.TYPE, new BaseConverter<Float>(Float.class) {
             public Float convert(Object value) {
                 if (value == null)
                     throw new NullPointerException();
@@ -114,7 +114,7 @@ class StandardConverters {
 
     public static Converter all() {
         return new Converter() {
-            public boolean supportsType(Class<?> type) {
+            public boolean supportsTarget(Class<?> type) {
                 return CONVERTERS.containsKey(type);
             }
 
