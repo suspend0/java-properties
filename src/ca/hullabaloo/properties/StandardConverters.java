@@ -11,68 +11,68 @@ import java.util.Map;
  * and the primitive versions of same.
  */
 class StandardConverters {
-    private static final Converter ALL;
+  private static final Converter ALL;
 
-    static {
-        final Map<Class<?>, Converter> converters = new HashMap<Class<?>, Converter>(4);
-        converters.put(String.class, new BaseConverter<String>(String.class) {
-            public String convert(String value) {
-              return value;
-            }
-        });
-        converters.put(Integer.class, new BaseConverter<Integer>(Integer.class) {
-            public Integer convert(String value) {
-                return Integer.parseInt(value);
-            }
-        });
-        converters.put(Integer.TYPE, new BaseConverter<Integer>(Integer.class) {
-            public Integer convert(String value) {
-                return Integer.parseInt(value);
-            }
-        });
-        converters.put(Double.class, new BaseConverter<Double>(Double.class) {
-            public Double convert(String value) {
-                return Double.parseDouble(value);
-            }
-        });
-        converters.put(Double.TYPE, new BaseConverter<Double>(Double.class) {
-            public Double convert(String value) {
-                return Double.parseDouble(value);
-            }
-        });
-        converters.put(Long.class, new BaseConverter<Long>(Long.class) {
-            public Long convert(String value) {
-                return Long.parseLong(value);
-            }
-        });
-        converters.put(Long.TYPE, new BaseConverter<Long>(Long.class) {
-            public Long convert(String value) {
-                return Long.parseLong(value);
-            }
-        });
-        converters.put(Float.class, new BaseConverter<Float>(Float.class) {
-            public Float convert(String value) {
-                return Float.parseFloat(value);
-            }
-        });
-        converters.put(Float.TYPE, new BaseConverter<Float>(Float.class) {
-            public Float convert(String value) {
-                return Float.parseFloat(value);
-            }
-        });
+  static {
+    final Map<Class<?>, Converter> converters = new HashMap<Class<?>, Converter>(4);
+    converters.put(String.class, new BaseConverter<String>(String.class) {
+      public String convert(String value) {
+        return value;
+      }
+    });
+    converters.put(Integer.class, new BaseConverter<Integer>(Integer.class) {
+      public Integer convert(String value) {
+        return Integer.parseInt(value);
+      }
+    });
+    converters.put(Integer.TYPE, new BaseConverter<Integer>(Integer.class) {
+      public Integer convert(String value) {
+        return Integer.parseInt(value);
+      }
+    });
+    converters.put(Double.class, new BaseConverter<Double>(Double.class) {
+      public Double convert(String value) {
+        return Double.parseDouble(value);
+      }
+    });
+    converters.put(Double.TYPE, new BaseConverter<Double>(Double.class) {
+      public Double convert(String value) {
+        return Double.parseDouble(value);
+      }
+    });
+    converters.put(Long.class, new BaseConverter<Long>(Long.class) {
+      public Long convert(String value) {
+        return Long.parseLong(value);
+      }
+    });
+    converters.put(Long.TYPE, new BaseConverter<Long>(Long.class) {
+      public Long convert(String value) {
+        return Long.parseLong(value);
+      }
+    });
+    converters.put(Float.class, new BaseConverter<Float>(Float.class) {
+      public Float convert(String value) {
+        return Float.parseFloat(value);
+      }
+    });
+    converters.put(Float.TYPE, new BaseConverter<Float>(Float.class) {
+      public Float convert(String value) {
+        return Float.parseFloat(value);
+      }
+    });
 
-        ALL = new Converter() {
-            public boolean supportsTarget(Class<?> type) {
-              return converters.containsKey(type);
-            }
+    ALL = new Converter() {
+      public boolean supportsTarget(Class<?> type) {
+        return converters.containsKey(type);
+      }
 
-            public <T> T convert(String s, Class<T> targetType) {
-              return converters.get(targetType).convert(s, targetType);
-            }
-        };
-    }
+      public <T> T convert(String s, Class<T> targetType) {
+        return converters.get(targetType).convert(s, targetType);
+      }
+    };
+  }
 
-    public static Converter all() {
-      return ALL;
-    }
+  public static Converter all() {
+    return ALL;
+  }
 }

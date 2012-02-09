@@ -1,5 +1,5 @@
 package ca.hullabaloo.properties;
 
 public enum Baz {
-    EH, BEE, SEA
+  EH, BEE, SEA
 }

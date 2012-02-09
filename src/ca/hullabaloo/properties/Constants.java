@@ -7,7 +7,6 @@ package ca.hullabaloo.properties;
  * map each method invocation.
  *
  * @TODO maybe this should be the default, and we should have LiveValues or something
- *
  * @see ca.hullabaloo.properties.JavaProperties
  */
 public interface Constants {

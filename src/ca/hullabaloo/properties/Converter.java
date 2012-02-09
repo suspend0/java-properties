@@ -7,19 +7,19 @@ package ca.hullabaloo.properties;
  * should convert Number to Integer too.)
  */
 interface Converter {
-    /**
-     * Return true if this type can be passed to {@link #convert} targetType
-     */
-    public boolean supportsTarget(Class<?> targetType);
+  /**
+   * Return true if this type can be passed to {@link #convert} targetType
+   */
+  public boolean supportsTarget(Class<?> targetType);
 
-    /**
-     * Convert the inbound object to the target type
-     *
-     * @param s     to be converted
-     * @param targetType the result type {@link #supportsTarget(Class)}
-     * @return the converted type
-     * @throws IllegalArgumentException if this is an invalid targetType
-     * @throws ClassCastException       if the inbound type cannot be converted
-     */
-    public <T> T convert(String s, Class<T> targetType);
+  /**
+   * Convert the inbound object to the target type
+   *
+   * @param s          to be converted
+   * @param targetType the result type {@link #supportsTarget(Class)}
+   * @return the converted type
+   * @throws IllegalArgumentException if this is an invalid targetType
+   * @throws ClassCastException       if the inbound type cannot be converted
+   */
+  public <T> T convert(String s, Class<T> targetType);
 }
