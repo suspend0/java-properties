@@ -8,7 +8,7 @@ class BaseConverterTest {
     public void supportsStringType() throws Exception {
         BaseConverter<String> instance = new BaseConverter<String>(String.class) {
             @Override
-            protected String convert(Object object) {
+            protected String convert(String s) {
                 return null;
             }
         };
@@ -19,7 +19,7 @@ class BaseConverterTest {
     public void supportsStringArrayType() throws Exception {
         BaseConverter<String[]> instance = new BaseConverter<String[]>(String[].class) {
             @Override
-            protected String[] convert(Object object) {
+            protected String[] convert(String s) {
                 return null;
             }
         };

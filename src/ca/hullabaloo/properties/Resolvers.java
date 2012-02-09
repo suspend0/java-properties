@@ -11,9 +11,9 @@ class Resolvers {
         };
     }
 
-    public static Resolver viewOf(final Map<String, ?> properties) {
+    public static Resolver viewOf(final Map<String, String> properties) {
         return new Resolver() {
-            public Object resolve(String name) {
+            public String resolve(String name) {
                 return properties.get(name);
             }
         };
@@ -21,8 +21,8 @@ class Resolvers {
 
     public static Resolver viewOf(final ResourceBundle properties) {
         return new Resolver() {
-            public Object resolve(String name) {
-                return properties.getObject(name);
+            public String resolve(String name) {
+                return properties.getString(name);
             }
         };
     }
@@ -30,9 +30,9 @@ class Resolvers {
     public static Resolver and(Iterable<Resolver> resolvers) {
         final Resolver[] copy = copyOf(resolvers);
         return new Resolver() {
-            public Object resolve(String name) {
+            public String resolve(String name) {
                 for (Resolver resolver : copy) {
-                    Object value = resolver.resolve(name);
+                    String value = resolver.resolve(name);
                     if (value != null)
                         return value;
                 }
@@ -51,7 +51,7 @@ class Resolvers {
 
     public static Resolver empty() {
         return new Resolver() {
-            public Object resolve(String name) {
+            public String resolve(String name) {
                 return null;
             }
         };

@@ -55,14 +55,8 @@ public class CustomConverterTest {
     }
 
     @Override
-    protected Option convert(Object object) {
-      if (object == null) {
-        return null;
-      }
-      if (object instanceof String) {
-        return Option.valueOf((String) object);
-      }
-      throw new IllegalArgumentException("could not convert " + object);
+    protected Option convert(String s) {
+      return Option.valueOf(s);
     }
   }
 }

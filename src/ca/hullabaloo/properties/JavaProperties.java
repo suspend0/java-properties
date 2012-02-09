@@ -58,7 +58,7 @@ public class JavaProperties {
             return this;
         }
 
-        public Builder add(Map<String, ?> props) {
+        public Builder add(Map<String, String> props) {
             values.add(Resolvers.viewOf(props));
             return this;
         }

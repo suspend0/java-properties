@@ -11,7 +11,7 @@ public class ConvertersTest {
                 return type == String.class;
             }
 
-            public <T> T convert(Object object, Class<T> targetType) {
+            public <T> T convert(String s, Class<T> targetType) {
                 return targetType.cast("x");
             }
         };
@@ -20,7 +20,7 @@ public class ConvertersTest {
                 return type == Integer.class;
             }
 
-            public <T> T convert(Object object, Class<T> targetType) {
+            public <T> T convert(String s, Class<T> targetType) {
                 return targetType.cast(1);
             }
         };
@@ -29,7 +29,7 @@ public class ConvertersTest {
         Assert.assertTrue(instance.supportsTarget(String.class));
         Assert.assertTrue(instance.supportsTarget(Integer.class));
         Assert.assertFalse(instance.supportsTarget(Float.class));
-        Assert.assertEquals(instance.convert(new Object(), String.class), "x");
-        Assert.assertEquals(instance.convert(new Object(), Integer.class), Integer.valueOf(1));
+        Assert.assertEquals(instance.convert("a", String.class), "x");
+        Assert.assertEquals(instance.convert("b", Integer.class), Integer.valueOf(1));
     }
 }

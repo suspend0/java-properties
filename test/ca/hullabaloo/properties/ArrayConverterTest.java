@@ -23,12 +23,6 @@ public class ArrayConverterTest {
           new String[]{"mary,lou", "steve,tammy"});
     }
 
-    @Test
-    void convertArray() {
-        Assert.assertEquals(instance.convert(new String[]{"a", "b"}, String[].class), new String[]{"a", "b"});
-        Assert.assertTrue(Arrays.equals(instance.convert(new int[]{2, 3}, int[].class), new int[]{2, 3}));
-    }
-
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void badConvert() {
         instance.convert("butter", String[].class);

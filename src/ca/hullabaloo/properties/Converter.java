@@ -15,11 +15,11 @@ interface Converter {
     /**
      * Convert the inbound object to the target type
      *
-     * @param object     to be converted
+     * @param s     to be converted
      * @param targetType the result type {@link #supportsTarget(Class)}
      * @return the converted type
      * @throws IllegalArgumentException if this is an invalid targetType
      * @throws ClassCastException       if the inbound type cannot be converted
      */
-    public <T> T convert(Object object, Class<T> targetType);
+    public <T> T convert(String s, Class<T> targetType);
 }

@@ -58,10 +58,10 @@ class Converters {
                 return false;
             }
 
-            public <T> T convert(Object object, Class<T> targetType) {
+            public <T> T convert(String s, Class<T> targetType) {
                 for (Converter converter : array) {
                     if (converter.supportsTarget(targetType))
-                        return converter.convert(object, targetType);
+                        return converter.convert(s, targetType);
                 }
                 throw new ClassCastException("could not convert");
             }

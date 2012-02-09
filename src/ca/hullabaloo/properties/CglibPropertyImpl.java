@@ -63,24 +63,23 @@ class CglibPropertyImpl<T> {
             Class<?> valueType = m.getReturnType();
 
             String prop = Utils.propertyName(m);
-            Object value = this.props.resolve(prop);
+            String value = this.props.resolve(prop);
             if (value == null) {
                 value = fromDefaultAnnotation(m);
                 constantValue = true;
             }
-            if (value != null) {
-                try {
-                    value = converter.convert(value, valueType);
-                } catch (RuntimeException e) {
-                    //noinspection ThrowableResultOfMethodCallIgnored
-                    errors.conversionError(m, value, e);
-                }
+            Object converted = null;
+            try {
+                converted = converter.convert(value, valueType);
+            } catch (RuntimeException e) {
+                //noinspection ThrowableResultOfMethodCallIgnored
+                errors.conversionError(m, value, e);
             }
-            if (value == null) {
+            if (converted == null) {
                 // nothing; we'll check if this is OK later
             } else if (constants || constantValue) {
                 callbackIndex.put(m, callbacks.size());
-                callbacks.add(new FixedValueImpl(value));
+                callbacks.add(new FixedValueImpl(converted));
             } else {
                 callbackIndex.put(m, callbacks.size());
                 callbacks.add(new LiveValueImpl(valueType, converter, prop, props));
@@ -223,7 +222,7 @@ class CglibPropertyImpl<T> {
         }
 
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) {
-            Object value = props.resolve(name);
+            String value = props.resolve(name);
             return converter.convert(value, valueType);
         }
     }

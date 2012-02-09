@@ -28,13 +28,9 @@ class ArrayConverter implements Converter {
         return type.isArray() && componentConverter.supportsTarget(type.getComponentType());
     }
 
-    public <T> T convert(Object object, Class<T> arrayType) {
+    public <T> T convert(String s, Class<T> arrayType) {
         checkArgument(supportsTarget(arrayType));
-        if (arrayType.isInstance(object))
-            return arrayType.cast(object);
-        if (object instanceof String)
-            return parse((String) object, arrayType);
-        throw new ClassCastException("could not convert");
+        return parse(s, arrayType);
     }
 
     /**
