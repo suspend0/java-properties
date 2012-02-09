@@ -6,7 +6,7 @@ package ca.hullabaloo.properties;
  * not strictly required.  (If this converts String to Integer, it
  * should convert Number to Integer too.)
  */
-public interface Converter {
+interface Converter {
     /**
      * Return true if this type can be passed to {@link #convert} targetType
      */

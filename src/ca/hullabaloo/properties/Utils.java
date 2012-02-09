@@ -1,6 +1,7 @@
 package ca.hullabaloo.properties;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 class Utils {
     static void checkArgument(boolean b) {
@@ -28,5 +29,9 @@ class Utils {
         }
 
         return result.toString();
+    }
+
+    public static <T> boolean addIfAbsent(Collection<? super T> c, T item) {
+        return !c.contains(item) && c.add(item);
     }
 }

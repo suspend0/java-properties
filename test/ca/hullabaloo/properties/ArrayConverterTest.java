@@ -14,6 +14,14 @@ public class ArrayConverterTest {
         Assert.assertEquals(instance.convert("[a, b]", String[].class), new String[]{"a", "b"});
         Assert.assertTrue(Arrays.equals(instance.convert("[2,3]", int[].class), new int[]{2, 3}));
     }
+  
+    @Test
+    public void convertWithEscapes() {
+      Assert.assertEquals(instance.convert("[mary\\,lou,steve]", String[].class),
+          new String[]{"mary,lou", "steve"});
+      Assert.assertEquals(instance.convert("[mary\\,lou, steve\\,tammy]", String[].class),
+          new String[]{"mary,lou", "steve,tammy"});
+    }
 
     @Test
     void convertArray() {

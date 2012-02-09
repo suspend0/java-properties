@@ -1,9 +1,13 @@
 package ca.hullabaloo.properties;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Utility methods to work on {@link Converter} instances
  */
-public class Converters {
+class Converters {
     /**
      * Returns a converter that converts the "standard java types": String, int, long, float, double
      */
@@ -29,6 +33,20 @@ public class Converters {
      * {@link Converter} interface will call each of the provided converters
      * in order until {@link Converter#supportsTarget(Class)} return true.
      */
+    public static Converter combine(Iterable<Converter> converters) {
+        final Converter[] a;
+        if(converters instanceof Collection) {
+            a = ((Collection<Converter>) converters).toArray(new Converter[((Collection<Converter>) converters).size()]);
+        } else {
+          List<Converter> t = new ArrayList<Converter>();
+          for (Converter converter : converters) {
+            t.add(converter);
+          }
+          a = t.toArray(new Converter[t.size()]);
+        }
+        return combine(a);
+    }
+
     public static Converter combine(Converter... converters) {
         final Converter[] array = converters.clone();
         return new Converter() {

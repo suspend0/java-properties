@@ -11,10 +11,10 @@ import java.util.Map;
  * and the primitive versions of same.
  */
 class StandardConverters {
-    private static final Map<Class<?>, Converter> CONVERTERS;
+    private static final Converter ALL;
 
     static {
-        Map<Class<?>, Converter> converters = new HashMap<Class<?>, Converter>(4);
+        final Map<Class<?>, Converter> converters = new HashMap<Class<?>, Converter>(4);
         converters.put(String.class, new BaseConverter<String>(String.class) {
             public String convert(Object value) {
                 return value == null ? null : value.toString();
@@ -39,7 +39,7 @@ class StandardConverters {
                     return Integer.parseInt((String) value);
                 if (value instanceof Number)
                     return ((Number) value).intValue();
-                throw new ClassCastException("could not convert to Integer " + value.getClass());
+                throw new ClassCastException("could not convert to int " + value.getClass());
             }
         });
         converters.put(Double.class, new BaseConverter<Double>(Double.class) {
@@ -61,7 +61,7 @@ class StandardConverters {
                     return Double.parseDouble((String) value);
                 if (value instanceof Number)
                     return ((Number) value).doubleValue();
-                throw new ClassCastException("could not convert to Double " + value.getClass());
+                throw new ClassCastException("could not convert to double " + value.getClass());
             }
         });
         converters.put(Long.class, new BaseConverter<Long>(Long.class) {
@@ -83,7 +83,7 @@ class StandardConverters {
                     return Long.parseLong((String) value);
                 if (value instanceof Number)
                     return ((Number) value).longValue();
-                throw new ClassCastException("could not convert to Long " + value.getClass());
+                throw new ClassCastException("could not convert to long " + value.getClass());
             }
         });
         converters.put(Float.class, new BaseConverter<Float>(Float.class) {
@@ -105,22 +105,22 @@ class StandardConverters {
                     return Float.parseFloat((String) value);
                 if (value instanceof Number)
                     return ((Number) value).floatValue();
-                throw new ClassCastException("could not convert to Float " + value.getClass());
+                throw new ClassCastException("could not convert to float " + value.getClass());
             }
         });
 
-        CONVERTERS = converters;
-    }
-
-    public static Converter all() {
-        return new Converter() {
+        ALL = new Converter() {
             public boolean supportsTarget(Class<?> type) {
-                return CONVERTERS.containsKey(type);
+              return converters.containsKey(type);
             }
 
             public <T> T convert(Object object, Class<T> targetType) {
-                return CONVERTERS.get(targetType).convert(object, targetType);
+              return converters.get(targetType).convert(object, targetType);
             }
         };
+    }
+
+    public static Converter all() {
+      return ALL;
     }
 }
