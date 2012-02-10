@@ -4,16 +4,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class PropertyMapImpl implements PropertyMap {
+class PropertyMapImpl implements PropertyMap {
   @SuppressWarnings("unchecked")
   private static <T> PropertyValue<T> cast(Val v) {
     return (PropertyValue<T>) v;
   }
 
+  @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
+  private static void fireAll(CopyOnWriteArrayList listeners, String name, Object newValue, Object oldValue) {
+    if (listeners != null) {
+      Iterable<PropertyListener> tmp = listeners;
+      for (PropertyListener propertyListener : tmp) {
+        propertyListener.fire(name, newValue, oldValue);
+      }
+    }
+  }
+
   private CopyOnWriteArrayList<PropertyListener<?>> listeners = new CopyOnWriteArrayList<PropertyListener<?>>();
   private ConcurrentMap<String, Val> map = new ConcurrentHashMap<String, Val>();
 
-  public <T> PropertyValue<T> obtain(String key, T defaultValue) {
+  @Override public <T> PropertyValue<T> obtain(String key, T defaultValue) {
     Val v = map.get(key);
     if (v == null) {
       Utils.checkArgument(defaultValue != null);
@@ -25,19 +35,12 @@ public class PropertyMapImpl implements PropertyMap {
     return cast(v);
   }
 
-  public void listen(PropertyListener<?> listener) {
+  @Override public void listen(PropertyListener<?> listener) {
     this.listeners.add(listener);
   }
 
-  @SuppressWarnings("unchecked")
-  private void fireAll(Val newValue, Object oldValue) {
-    for (PropertyListener listener : listeners) {
-      listener.fire(newValue, oldValue);
-    }
-  }
-
   private class Val<T> implements PropertyValue<T> {
-    private volatile CopyOnWriteArrayList<PropertyListener<T>> listeners;
+    private volatile CopyOnWriteArrayList<PropertyListener<? super T>> listeners;
     private volatile T currentValue;
     private final String name;
 
@@ -46,32 +49,22 @@ public class PropertyMapImpl implements PropertyMap {
       this.currentValue = value;
     }
 
-    public String name() {
-      return this.name;
-    }
-
-    public T get() {
+    @Override public T get() {
       return currentValue;
     }
 
-    public synchronized void set(T newValue) {
-      T oldValue = currentValue;
-      this.currentValue = newValue;
-      PropertyMapImpl.this.fireAll(this, oldValue);
-      this.fireAll(this, oldValue);
-    }
-
-    private void fireAll(Val<T> newValue, T oldValue) {
-      CopyOnWriteArrayList<PropertyListener<T>> listeners = this.listeners;
-      if (listeners != null) {
-        for (PropertyListener<T> listener : listeners) {
-          listener.fire(newValue, oldValue);
-        }
+    @Override public void set(T newValue) {
+      T oldValue;
+      synchronized (this) {
+        oldValue = currentValue;
+        this.currentValue = newValue;
       }
+      fireAll(PropertyMapImpl.this.listeners, name, newValue, oldValue);
+      fireAll(this.listeners, name, newValue, oldValue);
     }
 
-    public synchronized void listen(PropertyListener<T> listener) {
-      if (listeners == null) listeners = new CopyOnWriteArrayList<PropertyListener<T>>();
+    @Override public synchronized void listen(PropertyListener<? super T> listener) {
+      if (listeners == null) listeners = new CopyOnWriteArrayList<PropertyListener<? super T>>();
       listeners.add(listener);
     }
   }

@@ -72,14 +72,21 @@ public class PropertyMapTest {
     assertEquals(listener.oldValues, asList(12, 14, 24, 28));
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void typeSafety() {
+    PropertyMap m = new PropertyMapImpl();
+    m.obtain("c", 12);
+    m.obtain("c", "x");
+  }
+
   static class L implements PropertyListener<Integer> {
     List<String> names = new ArrayList<String>();
     List<Integer> oldValues = new ArrayList<Integer>();
     List<Integer> newValues = new ArrayList<Integer>();
 
-    public void fire(PropertyValue<Integer> newValue, Integer oldValue) {
-      names.add(newValue.name());
-      newValues.add(newValue.get());
+    @Override public void fire(String name, Integer newValue, Integer oldValue) {
+      names.add(name);
+      newValues.add(newValue);
       oldValues.add(oldValue);
     }
   }
