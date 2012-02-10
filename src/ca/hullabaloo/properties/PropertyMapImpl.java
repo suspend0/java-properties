@@ -1,7 +1,5 @@
 package ca.hullabaloo.properties;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 class PropertyMapImpl implements PropertyMap {
@@ -21,14 +19,13 @@ class PropertyMapImpl implements PropertyMap {
   }
 
   private CopyOnWriteArrayList<PropertyListener<?>> listeners = new CopyOnWriteArrayList<PropertyListener<?>>();
-  private ConcurrentMap<String, Val> map = new ConcurrentHashMap<String, Val>();
+  private Hash data = new Hash();
 
   @Override public <T> PropertyValue<T> obtain(String key, T defaultValue) {
-    Val v = map.get(key);
+    Val v = data.get(key);
     if (v == null) {
       Utils.checkArgument(defaultValue != null);
-      Val ex = map.putIfAbsent(key, v = new Val<T>(key, defaultValue));
-      if (ex != null) v = ex;
+      v = data.putIfAbsent(new Val<T>(key, defaultValue));
     } else {
       Utils.checkArgument(defaultValue != null && v.currentValue.getClass() == defaultValue.getClass());
     }
@@ -66,6 +63,59 @@ class PropertyMapImpl implements PropertyMap {
     @Override public synchronized void listen(PropertyListener<? super T> listener) {
       if (listeners == null) listeners = new CopyOnWriteArrayList<PropertyListener<? super T>>();
       listeners.add(listener);
+    }
+  }
+
+  private static final class Hash {
+    private volatile Val[] data = new Val[4];
+    private int size = 0;
+
+    public Val get(String key) {
+      Val[] data = this.data;
+      Val r;
+      int slot = key.hashCode() & (data.length - 1);
+      while ((r = data[slot]) != null) {
+        if (r.name.equals(key)) {
+          return r;
+        }
+        slot = (31 * slot) & (data.length - 1);
+      }
+      return r;
+    }
+
+    public synchronized Val putIfAbsent(Val val) {
+      Val[] data = this.data;
+      if (data.length / 2 < size) {
+        data = resize();
+      }
+      return putImpl(data, val);
+    }
+
+    private Val putImpl(Val[] data, Val val) {
+      Val r;
+      int slot = val.name.hashCode() & (data.length - 1);
+      while ((r = data[slot]) != null) {
+        if (val.name.hashCode() == r.name.hashCode() && val.name.equals(r.name)) {
+          return r;
+        }
+        slot = (31 * slot) & (data.length - 1);
+      }
+      data[slot] = val;
+      ++size;
+      return val;
+    }
+
+    private Val[] resize() {
+      Val[] oldA = this.data;
+      Val[] newA = new Val[this.data.length * 2];
+      for (Val v : oldA) {
+        if (v != null) {
+          putImpl(newA, v);
+        }
+      }
+      // since reads are not synchronized, we only publish the
+      // new array once resize is complete.  Puts are synchronized.
+      return (this.data = newA);
     }
   }
 }
