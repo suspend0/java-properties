@@ -36,6 +36,10 @@
     <inspection_tool class="JpaDataSourceORMInspection" level="ERROR" enabled="false" />
     <inspection_tool class="JpaModelErrorInspection" level="ERROR" enabled="false" />
     <inspection_tool class="JpaQueryApiInspection" level="ERROR" enabled="false" />
+    <inspection_tool class="MissingOverrideAnnotation" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoreObjectMethods" value="true" />
+      <option name="ignoreAnonymousClassMethods" value="true" />
+    </inspection_tool>
     <inspection_tool class="StringEquality" enabled="false" level="WARNING" enabled_by_default="false" />
   </profile>
 </component>
