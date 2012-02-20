@@ -13,7 +13,7 @@ class PropertyMapImpl implements PropertyMap {
     if (listeners != null) {
       Iterable<PropertyListener> tmp = listeners;
       for (PropertyListener propertyListener : tmp) {
-        propertyListener.fire(name, newValue, oldValue);
+        propertyListener.hear(name, newValue, oldValue);
       }
     }
   }
@@ -22,12 +22,13 @@ class PropertyMapImpl implements PropertyMap {
   private Hash data = new Hash();
 
   @Override public <T> PropertyValue<T> obtain(String key, T defaultValue) {
+    Utils.checkArgument(defaultValue != null);
     Val v = data.get(key);
     if (v == null) {
-      Utils.checkArgument(defaultValue != null);
       v = data.putIfAbsent(new Val<T>(key, defaultValue));
     } else {
-      Utils.checkArgument(defaultValue != null && v.currentValue.getClass() == defaultValue.getClass());
+      assert defaultValue != null;
+      Utils.checkArgument(v.currentValue.getClass() == defaultValue.getClass());
     }
     return cast(v);
   }
@@ -37,7 +38,9 @@ class PropertyMapImpl implements PropertyMap {
   }
 
   private class Val<T> implements PropertyValue<T> {
+    // guarded by 'this'; initialized to 'null'
     private volatile CopyOnWriteArrayList<PropertyListener<? super T>> listeners;
+    // unguarded, never null
     private volatile T currentValue;
     private final String name;
 
@@ -70,38 +73,43 @@ class PropertyMapImpl implements PropertyMap {
     private volatile Val[] data = new Val[4];
     private int size = 0;
 
+    private static int slot(String key, Val[] data) {return key.hashCode() & (data.length - 1);}
+
+    private static int nextSlot(int slot, Val[] data) {return (slot + 1) & (data.length - 1);}
+
     public Val get(String key) {
       Val[] data = this.data;
       Val r;
-      int slot = key.hashCode() & (data.length - 1);
+      int slot = slot(key, data);
       while ((r = data[slot]) != null) {
         if (r.name.equals(key)) {
           return r;
         }
-        slot = (31 * slot) & (data.length - 1);
+        slot = nextSlot(slot, data);
       }
       return r;
     }
 
     public synchronized Val putIfAbsent(Val val) {
       Val[] data = this.data;
-      if (data.length / 2 < size) {
+      if (data.length / 2 <= size) {
         data = resize();
       }
-      return putImpl(data, val);
+      Val r = putImpl(data, val);
+      if (r == val) size++;
+      return r;
     }
 
-    private Val putImpl(Val[] data, Val val) {
+    private static Val putImpl(Val[] data, Val val) {
       Val r;
-      int slot = val.name.hashCode() & (data.length - 1);
+      int slot = slot(val.name, data);
       while ((r = data[slot]) != null) {
         if (val.name.hashCode() == r.name.hashCode() && val.name.equals(r.name)) {
           return r;
         }
-        slot = (31 * slot) & (data.length - 1);
+        slot = nextSlot(slot, data);
       }
       data[slot] = val;
-      ++size;
       return val;
     }
 

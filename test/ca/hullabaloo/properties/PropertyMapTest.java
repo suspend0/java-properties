@@ -31,6 +31,7 @@ public class PropertyMapTest {
     PropertyValue<Integer> v1 = m.obtain("c", 12);
     PropertyValue<Integer> v2 = m.obtain("c", 14);
     assertEquals(v1.get().intValue(), 12);
+    assertEquals(v2.get().intValue(), 12);
     // strictly speaking, these don't need to be the same, but that assumption simplifies the listener testing
     assertSame(v1, v2);
   }
@@ -84,7 +85,7 @@ public class PropertyMapTest {
     List<Integer> oldValues = new ArrayList<Integer>();
     List<Integer> newValues = new ArrayList<Integer>();
 
-    @Override public void fire(String name, Integer newValue, Integer oldValue) {
+    @Override public void hear(String name, Integer newValue, Integer oldValue) {
       names.add(name);
       newValues.add(newValue);
       oldValues.add(oldValue);
