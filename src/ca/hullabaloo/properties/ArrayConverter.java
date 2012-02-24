@@ -3,6 +3,7 @@ package ca.hullabaloo.properties;
 import java.lang.reflect.Array;
 
 import static ca.hullabaloo.properties.Utils.checkArgument;
+import static ca.hullabaloo.properties.Utils.q;
 
 /**
  * Wraps a regular {@Converter} to parse arrays of same from strings formatted the way
@@ -24,13 +25,13 @@ class ArrayConverter implements Converter {
     this.componentConverter = componentConverter;
   }
 
-  public boolean supportsTarget(Class<?> type) {
+  @Override public boolean supportsTarget(Class<?> type) {
     return type.isArray() && componentConverter.supportsTarget(type.getComponentType());
   }
 
-  public <T> T convert(String s, Class<T> arrayType) {
+  @Override public <T> T convert(String s, Class<T> arrayType) {
     checkArgument(supportsTarget(arrayType));
-    return parse(s, arrayType);
+    return s == null ? null : parse(s, arrayType);
   }
 
   /**
@@ -72,7 +73,7 @@ class ArrayConverter implements Converter {
       }
       return arrayType.cast(result);
     }
-    throw new IllegalArgumentException("Expected array format [a,b] " + str);
+    throw new IllegalArgumentException("Expected array format like [a,b] got " + q(str));
   }
 
   @Override

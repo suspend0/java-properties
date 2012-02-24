@@ -41,4 +41,8 @@ class Utils {
   public static <T> boolean addIfAbsent(Collection<? super T> c, T item) {
     return !c.contains(item) && c.add(item);
   }
+
+  public static String q(String str) {
+    return "'" + str + "'";
+  }
 }

@@ -8,17 +8,17 @@ import static ca.hullabaloo.properties.Utils.checkArgument;
 enum EnumConverter implements Converter {
   INSTANCE;
 
-  public boolean supportsTarget(Class<?> type) {
+  @Override public boolean supportsTarget(Class<?> type) {
     return type.isEnum();
   }
 
-  @SuppressWarnings({"unchecked"})
+  @Override @SuppressWarnings({"unchecked"})
   public <T> T convert(String s, Class<T> targetType) {
     checkArgument(supportsTarget(targetType));
-    Exception cause = null;
+    Exception cause;
     try {
       Class<? extends Enum> enumType = targetType.asSubclass(Enum.class);
-      return (T) Enum.valueOf(enumType, s);
+      return s == null ? null : (T) Enum.valueOf(enumType, s);
     } catch (IllegalArgumentException e) {
       // from enum.valueOf
       cause = e;

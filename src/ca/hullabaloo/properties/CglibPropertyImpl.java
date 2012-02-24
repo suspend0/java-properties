@@ -72,7 +72,9 @@ class CglibPropertyImpl<T> {
       }
       Object converted = null;
       try {
-        converted = converter.convert(value, valueType);
+        if (!(value == null && valueType.isPrimitive())) {
+          converted = converter.convert(value, valueType);
+        }
       } catch (RuntimeException e) {
         //noinspection ThrowableResultOfMethodCallIgnored
         errors.conversionError(m, value, e);
@@ -198,7 +200,7 @@ class CglibPropertyImpl<T> {
       this.callbackIndexes = callbackIndexes;
     }
 
-    public int accept(Method method) {
+    @Override public int accept(Method method) {
       Integer i = this.callbackIndexes.get(method);
       return i == null ? 0 : i;
     }
@@ -214,7 +216,7 @@ class CglibPropertyImpl<T> {
       this.value = value;
     }
 
-    public Object loadObject() throws Exception {
+    @Override public Object loadObject() throws Exception {
       return this.value;
     }
   }
@@ -235,7 +237,7 @@ class CglibPropertyImpl<T> {
       this.props = props;
     }
 
-    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) {
+    @Override public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) {
       String value = props.resolve(name);
       return converter.convert(value, valueType);
     }
